@@ -13,7 +13,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface NetworkHelper : NSObject
 
-+ (NSString *)URLFromSearchString:(NSString *)searchString;
++ (NSString *)URLFromSearchString:(NSString *)searchString forPage:(NSInteger)page;
 
 @end
 

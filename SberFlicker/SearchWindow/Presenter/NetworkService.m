@@ -14,9 +14,9 @@
 
 #pragma mark - Getting PhotoJSON
 
-+ (void)findPhotosBySearchString:(NSString *)searchString completion:(void (^)(PhotoJSONModel *))completion
++ (void)findPhotosBySearchString:(NSString *)searchString onPage:(NSInteger)page completion:(void (^)(PhotoJSONModel *))completion
 {
-    NSString *urlString = [NetworkHelper URLFromSearchString:searchString];
+    NSString *urlString = [NetworkHelper URLFromSearchString:searchString forPage:page];
     NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:urlString]];
     NSURLSession *session = [NSURLSession sharedSession];
     
@@ -27,7 +27,7 @@
         }
         
         NSDictionary *jsonDict = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&error];
-//        NSLog(@"%@", jsonDict);
+        NSLog(@"%@", jsonDict);
         if ([jsonDict[@"stat"] isEqualToString:@"fail"])
         {
             completion(nil);

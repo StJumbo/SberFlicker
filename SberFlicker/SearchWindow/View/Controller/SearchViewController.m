@@ -13,14 +13,21 @@
 #import "PhotoCollectionViewCell.h"
 
 @interface SearchViewController () <UISearchBarDelegate, UICollectionViewDelegate, UICollectionViewDataSource>
-@property (nonatomic) NSArray<PhotoModel *> *collectionViewArray;
+@property (nonatomic) NSMutableArray<PhotoModel *> *collectionViewArray;
 @property (nonatomic, strong) UICollectionView *collectionView;
+@property (nonatomic, strong) NSMutableString *searchText;
+@property (nonatomic) NSInteger currentPage;
+@property (nonatomic) NSInteger currentOffset;
 @end
 
 @implementation SearchViewController
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    self.currentPage = 0;
+    self.currentOffset = 0;
+    self.searchText = [NSMutableString new];
+    self.collectionViewArray = [NSMutableArray new];
     
     UIBarButtonItem *pushBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Push" style:UIBarButtonItemStylePlain target:self action:@selector(openPushVC)];
     //Не знаю, почему ширина pushBarButtonItem при инициализации задается равной 0,
@@ -58,23 +65,45 @@
 }
 
 
+#pragma mark - Support functions
+- (void)searchNextPageWithText:(NSString *)text
+{
+    NSInteger nextPage = self.currentPage + 1;
+    [NetworkService findPhotosBySearchString:text onPage:nextPage completion:^(PhotoJSONModel * _Nonnull photoJSON) {
+        if (photoJSON.page < photoJSON.pagesTotal)
+        {
+
+        }
+        if (!(photoJSON == nil))
+        {
+            NSLog(@"OVER HERE");
+            self.currentPage = photoJSON.page;
+            [self.collectionViewArray addObjectsFromArray:photoJSON.photos];
+            [self reloadCollectionView];
+        }
+    }];
+}
+
 #pragma mark - SearchBar Delegate
 
 - (void)searchBarSearchButtonClicked:(UISearchBar *)searchBar
 {
     [searchBar resignFirstResponder];
-    self.collectionViewArray = @[];
+    [self.collectionViewArray removeAllObjects];
     NSString *text = searchBar.text;
-    [NetworkService findPhotosBySearchString:text completion:^(PhotoJSONModel * _Nonnull result) {
-        self.collectionViewArray = result.photos;
-        [self reloadCollectionView];
-    }];
+    [self.searchText setString:text];
+    [self searchNextPageWithText:text];
+    
 }
 
 - (void)searchBarCancelButtonClicked:(UISearchBar *)searchBar
 {
+    [self.collectionView scrollToItemAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:0] atScrollPosition:UICollectionViewScrollPositionTop animated:YES];
     [searchBar resignFirstResponder];
     [searchBar setText:@""];
+    [self.searchText setString:@""];
+    [self.collectionViewArray removeAllObjects];
+    [self reloadCollectionView];
 }
 
 
@@ -95,6 +124,16 @@
 
 - (NSInteger)collectionView:(nonnull UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section {
     return self.collectionViewArray.count;
+}
+
+
+- (void)collectionView:(UICollectionView *)collectionView willDisplayCell:(UICollectionViewCell *)cell forItemAtIndexPath:(NSIndexPath *)indexPath
+{
+    if (indexPath.item == self.currentOffset)
+    {
+        self.currentOffset += 40;
+        [self searchNextPageWithText:self.searchText];
+    }
 }
 
 
