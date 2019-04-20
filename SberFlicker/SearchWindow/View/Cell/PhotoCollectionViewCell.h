@@ -14,7 +14,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic) UIImageView *picView;
 +(NSString *)reuseID;
-- (void)fillCell;
 
 @end
 

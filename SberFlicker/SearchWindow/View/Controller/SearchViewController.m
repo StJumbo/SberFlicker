@@ -17,7 +17,6 @@
 @property (nonatomic, strong) UICollectionView *collectionView;
 @property (nonatomic, strong) NSMutableString *searchText;
 @property (nonatomic) NSInteger currentPage;
-@property (nonatomic) NSInteger currentOffset;
 @end
 
 @implementation SearchViewController
@@ -25,7 +24,6 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     self.currentPage = 0;
-    self.currentOffset = 0;
     self.searchText = [NSMutableString new];
     self.collectionViewArray = [NSMutableArray new];
     
@@ -57,18 +55,13 @@
     [self.collectionView setBackgroundColor:UIColor.whiteColor];
     
     [self.view addSubview:self.collectionView];
-    
-//    NSString *picURL = @"https://live.staticflickr.com/4907/44426140660_fca2077ab0_h.jpg";
-//    [NetworkService getImageFromURL:picURL completion:^(UIImage * _Nonnull picture) {
-//        NSLog(@"PICTURE IS: \n%@", picture);
-//    }];
 }
 
 
 #pragma mark - Support functions
 - (void)searchNextPageWithText:(NSString *)text
 {
-    NSInteger nextPage = self.currentPage + 1;
+    NSInteger nextPage = ++self.currentPage;
     [NetworkService findPhotosBySearchString:text onPage:nextPage completion:^(PhotoJSONModel * _Nonnull photoJSON) {
         if (photoJSON.page < photoJSON.pagesTotal)
         {
@@ -88,17 +81,19 @@
 
 - (void)searchBarSearchButtonClicked:(UISearchBar *)searchBar
 {
-    [searchBar resignFirstResponder];
-    [self.collectionViewArray removeAllObjects];
     NSString *text = searchBar.text;
-    [self.searchText setString:text];
-    [self searchNextPageWithText:text];
-    
+    if (![self.searchText isEqualToString:text])
+    {
+        [self.collectionViewArray removeAllObjects];
+        [self reloadCollectionView];
+        [self.searchText setString:text];
+        [self searchNextPageWithText:text];
+    }
+    [searchBar resignFirstResponder];
 }
 
 - (void)searchBarCancelButtonClicked:(UISearchBar *)searchBar
 {
-    [self.collectionView scrollToItemAtIndexPath:[NSIndexPath indexPathForItem:0 inSection:0] atScrollPosition:UICollectionViewScrollPositionTop animated:YES];
     [searchBar resignFirstResponder];
     [searchBar setText:@""];
     [self.searchText setString:@""];
@@ -129,13 +124,11 @@
 
 - (void)collectionView:(UICollectionView *)collectionView willDisplayCell:(UICollectionViewCell *)cell forItemAtIndexPath:(NSIndexPath *)indexPath
 {
-    if (indexPath.item == self.currentOffset)
+    if (indexPath.item == self.collectionViewArray.count - 35)
     {
-        self.currentOffset += 40;
         [self searchNextPageWithText:self.searchText];
     }
 }
-
 
 #pragma mark - Reload CollectionView
 
