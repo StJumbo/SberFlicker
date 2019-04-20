@@ -10,13 +10,14 @@
 #import "ScrollPresenter.h"
 
 
-@interface ScrollViewController ()
+@interface ScrollViewController () <UIScrollViewDelegate>
 
 @property (nonatomic, strong)PhotoModel *picture;
 @property (nonatomic, strong)ScrollPresenter *presenter;
 @property (nonatomic, strong)UIImage *image;
 @property (nonatomic, strong)UIImageView *imageView;
 @property (nonatomic, strong)CIFilter *filter;
+@property (nonatomic, strong)UIActivityIndicatorView *activityIndicator;
 
 @end
 
@@ -28,41 +29,61 @@
     [self.view setBackgroundColor:UIColor.whiteColor];
     self.presenter = [ScrollPresenter new];
     self.presenter.netwotkDelegate = [NetworkService new];
-    UIActivityIndicatorView *activityIndicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
-    [self.view addSubview:activityIndicator];
-    [activityIndicator setCenter:self.view.center];
-    [activityIndicator startAnimating];
     
-    if (self.picture.pictureURL)
-    {
-        [self.presenter.netwotkDelegate getImageFromURL:self.picture.pictureURL completion:^(UIImage * _Nonnull picture) {
-            
-            dispatch_async(dispatch_get_main_queue(), ^{
-                self.imageView = [[UIImageView alloc] initWithImage:picture];
-                UIScrollView *scrollView = [[UIScrollView alloc] initWithFrame:self.view.bounds];
-                [scrollView addSubview:self.imageView];
-                [scrollView setScrollEnabled:YES];
-                [scrollView setContentSize:self.imageView.bounds.size];
-                
-                [self.view addSubview:scrollView];
-                self.image = picture;
-                [activityIndicator stopAnimating];
-            });
-        }];
-    }
+    self.activityIndicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
+    [self.view addSubview:self.activityIndicator];
+    [self.activityIndicator setCenter:self.view.center];
+    [self.activityIndicator startAnimating];
+    
+    [self downloadPicture];
 }
 
 - (void)viewWillAppear:(BOOL)animated
 {
-    
     [self removeSearchBar];
-    
 }
 
 - (void)viewDidAppear:(BOOL)animated
 {
     [self addFilterButton];
 }
+
+- (void)downloadPicture
+{
+    if (self.picture.pictureURL)
+    {
+        [self.presenter.netwotkDelegate getImageFromURL:self.picture.pictureURL completion:^(UIImage * _Nonnull picture) {
+            
+            dispatch_async(dispatch_get_main_queue(), ^{
+                self.imageView = [[UIImageView alloc] initWithImage:picture];
+                CGFloat systemHeight = self.navigationController.navigationBar.frame.size.height + UIApplication.sharedApplication.statusBarFrame.size.height;
+                UIScrollView *scrollView = [[UIScrollView alloc] initWithFrame:CGRectMake(self.view.bounds.origin.x, self.view.bounds.origin.y + systemHeight, self.view.bounds.size.width, self.view.bounds.size.height - systemHeight)];
+                [scrollView setMinimumZoomScale:0.1f];
+                [scrollView setMaximumZoomScale:2.0];
+                [scrollView addSubview:self.imageView];
+                [scrollView setScrollEnabled:YES];
+                [scrollView setClipsToBounds:YES];
+                [scrollView setContentSize:self.imageView.bounds.size];
+                scrollView.delegate = self;
+                
+                [self.view addSubview:scrollView];
+                self.image = picture;
+                [self.activityIndicator stopAnimating];
+            });
+        }];
+    }
+}
+
+
+#pragma mark - Setting picture
+
+- (void)setCurrentPicture:(PhotoModel *)picture
+{
+    self.picture = picture;
+}
+
+
+#pragma mark - Working with NavBar
 
 - (void)removeSearchBar
 {
@@ -77,11 +98,6 @@
     }
 }
 
-- (void)setCurrentPicture:(PhotoModel *)picture
-{
-    self.picture = picture;
-}
-
 - (void)addFilterButton
 {
     UIBarButtonItem *filterButton = [[UIBarButtonItem alloc] initWithTitle:@"Random filter" style:UIBarButtonItemStylePlain target:self action:@selector(setFilter)];
@@ -89,21 +105,29 @@
     [self.navigationController.navigationBar.topItem setRightBarButtonItem:filterButton];
 }
 
+
+#pragma mark - ScrollView Delegate
+- (UIView *)viewForZoomingInScrollView:(UIScrollView *)scrollView
+{
+    return self.imageView;
+}
+
+#pragma mark - Filter functions
+
 - (void)setFilter
 {
-    self.filter = nil;
     if (self.image)
     {
         CIImage *image = [[CIImage alloc] initWithImage:self.image];
         NSInteger index = arc4random() % 5;
         self.filter = [self filterWithType:index];
         [self.filter setValue:image forKey:kCIInputImageKey];
+        CIImage *result = [self.filter valueForKey: @"outputImage"];
+        CGImageRef cgImageRef = [[CIContext contextWithOptions:nil] createCGImage:result fromRect:[result extent]];
+        UIImage *targetImage = [UIImage imageWithCGImage:cgImageRef];
+        self.imageView.image = targetImage;
     }
-    CIImage *result = [self.filter valueForKey: @"outputImage"];
-    CGImageRef cgImageRef = [[CIContext contextWithOptions:nil] createCGImage:result fromRect:[result extent]];
-    UIImage *targetImage = [UIImage imageWithCGImage:cgImageRef];
-    self.imageView.image = targetImage;
-    self.image = targetImage;
+    
     
 }
 
