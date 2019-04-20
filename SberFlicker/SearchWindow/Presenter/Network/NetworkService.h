@@ -14,8 +14,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface NetworkService : NSObject
 
-+ (void)findPhotosBySearchString:(NSString *)searchString onPage:(NSInteger)page completion:(void (^)(PhotoJSONModel *))completion;
-+ (void)getImageFromURL:(NSString *)picURL completion:(void (^)(UIImage *))completion;
+- (void)findPhotosBySearchString:(NSString *)searchString onPage:(NSInteger)page completion:(void (^)(PhotoJSONModel *))completion;
+- (void)getImageFromURL:(NSString *)picURL completion:(void (^)(UIImage *))completion;
 
 @end
 

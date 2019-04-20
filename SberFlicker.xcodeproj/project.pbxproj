@@ -18,6 +18,7 @@
 		13699707226A190200B90F83 /* PhotoJSONModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 13699706226A190200B90F83 /* PhotoJSONModel.m */; };
 		1369970B226A1C0900B90F83 /* PhotoModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 1369970A226A1C0900B90F83 /* PhotoModel.m */; };
 		1369970E226A8AC500B90F83 /* PhotoCollectionViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 1369970D226A8AC500B90F83 /* PhotoCollectionViewCell.m */; };
+		13699712226B6EC000B90F83 /* SearchPresenter.m in Sources */ = {isa = PBXBuildFile; fileRef = 13699711226B6EC000B90F83 /* SearchPresenter.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -41,6 +42,8 @@
 		1369970A226A1C0900B90F83 /* PhotoModel.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PhotoModel.m; sourceTree = "<group>"; };
 		1369970C226A8AC500B90F83 /* PhotoCollectionViewCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PhotoCollectionViewCell.h; sourceTree = "<group>"; };
 		1369970D226A8AC500B90F83 /* PhotoCollectionViewCell.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PhotoCollectionViewCell.m; sourceTree = "<group>"; };
+		13699710226B6EC000B90F83 /* SearchPresenter.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SearchPresenter.h; sourceTree = "<group>"; };
+		13699711226B6EC000B90F83 /* SearchPresenter.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SearchPresenter.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -116,10 +119,9 @@
 		136996FE226A0A7D00B90F83 /* Presenter */ = {
 			isa = PBXGroup;
 			children = (
-				13699702226A0CC400B90F83 /* NetworkService.h */,
-				13699703226A0CC400B90F83 /* NetworkService.m */,
-				136996FF226A0AB600B90F83 /* NetworkHelper.h */,
-				13699700226A0AB600B90F83 /* NetworkHelper.m */,
+				13699710226B6EC000B90F83 /* SearchPresenter.h */,
+				13699711226B6EC000B90F83 /* SearchPresenter.m */,
+				13699713226B6EC500B90F83 /* Network */,
 			);
 			path = Presenter;
 			sourceTree = "<group>";
@@ -142,6 +144,17 @@
 				1369970D226A8AC500B90F83 /* PhotoCollectionViewCell.m */,
 			);
 			path = Cell;
+			sourceTree = "<group>";
+		};
+		13699713226B6EC500B90F83 /* Network */ = {
+			isa = PBXGroup;
+			children = (
+				13699702226A0CC400B90F83 /* NetworkService.h */,
+				13699703226A0CC400B90F83 /* NetworkService.m */,
+				136996FF226A0AB600B90F83 /* NetworkHelper.h */,
+				13699700226A0AB600B90F83 /* NetworkHelper.m */,
+			);
+			path = Network;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -213,6 +226,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				13699712226B6EC000B90F83 /* SearchPresenter.m in Sources */,
 				1304B05A2265D2BF00569398 /* SberFlicker.xcdatamodeld in Sources */,
 				1369970E226A8AC500B90F83 /* PhotoCollectionViewCell.m in Sources */,
 				1304B0622265D2C100569398 /* main.m in Sources */,

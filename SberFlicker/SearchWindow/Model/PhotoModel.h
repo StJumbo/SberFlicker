@@ -7,6 +7,7 @@
 //
 
 #import <Foundation/Foundation.h>
+#import <UIKit/UIKit.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -19,6 +20,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic) NSString *title;
 @property (nonatomic) NSString *pictureURL;
 @property (nonatomic) NSString *thumbnailPictureURL;
+@property (nonatomic) UIImage *thumbnailPicture;
 
 @end
 

@@ -14,7 +14,7 @@
 
 #pragma mark - Getting PhotoJSON
 
-+ (void)findPhotosBySearchString:(NSString *)searchString onPage:(NSInteger)page completion:(void (^)(PhotoJSONModel *))completion
+- (void)findPhotosBySearchString:(NSString *)searchString onPage:(NSInteger)page completion:(void (^)(PhotoJSONModel *))completion
 {
     NSString *urlString = [NetworkHelper URLFromSearchString:searchString forPage:page];
     NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:urlString]];
@@ -27,7 +27,7 @@
         }
         
         NSDictionary *jsonDict = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&error];
-        NSLog(@"%@", jsonDict);
+//        NSLog(@"%@", jsonDict);
         if ([jsonDict[@"stat"] isEqualToString:@"fail"])
         {
             completion(nil);
@@ -41,7 +41,7 @@
     [dataTask resume];
 }
 
-+ (PhotoJSONModel *)parseJSONFromDict:(NSDictionary *)dict
+- (PhotoJSONModel *)parseJSONFromDict:(NSDictionary *)dict
 {
     PhotoJSONModel *photoJSON = [PhotoJSONModel new];
     photoJSON.page = (NSInteger)dict[@"page"];
@@ -52,7 +52,7 @@
     return photoJSON;
 }
 
-+ (NSArray<PhotoModel *> *)parsePhotoJSONFromArray:(NSArray *)array
+- (NSArray<PhotoModel *> *)parsePhotoJSONFromArray:(NSArray *)array
 {
     NSMutableArray<PhotoModel *> *photosArray = [NSMutableArray new];
     for (int i = 0; i < array.count; i++)
@@ -73,8 +73,10 @@
     return photosArray;
 }
 
+
 #pragma mark - Getting image
-+ (void)getImageFromURL:(NSString *)picURL completion:(void (^)(UIImage *))completion
+
+- (void)getImageFromURL:(NSString *)picURL completion:(void (^)(UIImage *))completion
 {
     NSURLRequest *request = [NSURLRequest requestWithURL:[NSURL URLWithString:picURL]];
     NSURLSession *session = [NSURLSession sharedSession];

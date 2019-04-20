@@ -11,10 +11,12 @@
 #import "PhotoJSONModel.h"
 #import "PhotoModel.h"
 #import "PhotoCollectionViewCell.h"
+#import "SearchPresenter.h"
 
 @interface SearchViewController () <UISearchBarDelegate, UICollectionViewDelegate, UICollectionViewDataSource>
 @property (nonatomic) NSMutableArray<PhotoModel *> *collectionViewArray;
 @property (nonatomic, strong) UICollectionView *collectionView;
+@property (nonatomic, strong) SearchPresenter *presenter;
 @property (nonatomic, strong) NSMutableString *searchText;
 @property (nonatomic) NSInteger currentPage;
 @end
@@ -23,6 +25,8 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    self.presenter = [SearchPresenter new];
+    self.presenter.netwotkDelegate = [NetworkService new];
     self.currentPage = 0;
     self.searchText = [NSMutableString new];
     self.collectionViewArray = [NSMutableArray new];
@@ -59,18 +63,13 @@
 
 
 #pragma mark - Support functions
+
 - (void)searchNextPageWithText:(NSString *)text
 {
-    NSInteger nextPage = ++self.currentPage;
-    [NetworkService findPhotosBySearchString:text onPage:nextPage completion:^(PhotoJSONModel * _Nonnull photoJSON) {
-        if (photoJSON.page < photoJSON.pagesTotal)
-        {
-
-        }
+    self.currentPage++;
+    [self.presenter.netwotkDelegate findPhotosBySearchString:text onPage:self.currentPage completion:^(PhotoJSONModel * _Nonnull photoJSON) {
         if (!(photoJSON == nil))
         {
-            NSLog(@"OVER HERE");
-            self.currentPage = photoJSON.page;
             [self.collectionViewArray addObjectsFromArray:photoJSON.photos];
             [self reloadCollectionView];
         }
@@ -106,13 +105,30 @@
 
 - (nonnull __kindof UICollectionViewCell *)collectionView:(nonnull UICollectionView *)collectionView cellForItemAtIndexPath:(nonnull NSIndexPath *)indexPath {
     PhotoCollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:PhotoCollectionViewCell.reuseID forIndexPath:indexPath];
-    [NetworkService getImageFromURL:self.collectionViewArray[indexPath.row].thumbnailPictureURL completion:^(UIImage * _Nonnull picture) {
-        
-        dispatch_async(dispatch_get_main_queue(), ^{
-            cell.picView.image = picture;
-            cell.picView.contentMode = UIViewContentModeScaleAspectFill;
-        });
-    }];
+    PhotoModel *photoForCell = self.collectionViewArray[indexPath.item];
+    if (photoForCell.thumbnailPicture != nil)
+    {
+        cell.picView.image = photoForCell.thumbnailPicture;
+    }
+    else
+    {
+        [self.presenter.netwotkDelegate getImageFromURL:self.collectionViewArray[indexPath.item].thumbnailPictureURL completion:^(UIImage * _Nonnull picture) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                PhotoCollectionViewCell *showingCell = [collectionView dequeueReusableCellWithReuseIdentifier:PhotoCollectionViewCell.reuseID forIndexPath:indexPath];
+                if (showingCell)
+                {
+                    cell.picView.image = picture;
+                    cell.picView.contentMode = UIViewContentModeScaleAspectFill;
+                }
+                else
+                {
+                    self.collectionViewArray[indexPath.item].thumbnailPicture = picture;
+                }
+                
+            });
+        }];
+    }
+    
     
     return cell;
 }
@@ -124,7 +140,7 @@
 
 - (void)collectionView:(UICollectionView *)collectionView willDisplayCell:(UICollectionViewCell *)cell forItemAtIndexPath:(NSIndexPath *)indexPath
 {
-    if (indexPath.item == self.collectionViewArray.count - 35)
+    if (indexPath.item == self.collectionViewArray.count - 25)
     {
         [self searchNextPageWithText:self.searchText];
     }
