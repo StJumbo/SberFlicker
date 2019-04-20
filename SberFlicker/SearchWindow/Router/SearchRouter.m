@@ -8,6 +8,7 @@
 
 #import "SearchRouter.h"
 #import "PushViewController.h"
+#import "ScrollViewController.h"
 
 @interface SearchRouter ()
 
@@ -30,7 +31,9 @@
 
 - (void)showCurrentPicture:(PhotoModel *)picture
 {
-    
+    ScrollViewController *nextVC = [ScrollViewController new];
+    [nextVC setCurrentPicture:picture];
+    [self.navigationController pushViewController:nextVC animated:YES];
 }
 
 @end

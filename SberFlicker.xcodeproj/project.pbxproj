@@ -21,6 +21,8 @@
 		13699712226B6EC000B90F83 /* SearchPresenter.m in Sources */ = {isa = PBXBuildFile; fileRef = 13699711226B6EC000B90F83 /* SearchPresenter.m */; };
 		13699716226B764F00B90F83 /* SearchRouter.m in Sources */ = {isa = PBXBuildFile; fileRef = 13699715226B764F00B90F83 /* SearchRouter.m */; };
 		1369971A226B777100B90F83 /* PushViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 13699719226B777100B90F83 /* PushViewController.m */; };
+		13699720226B8CA200B90F83 /* ScrollViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1369971F226B8CA200B90F83 /* ScrollViewController.m */; };
+		13699726226B8CE000B90F83 /* ScrollPresenter.m in Sources */ = {isa = PBXBuildFile; fileRef = 13699725226B8CE000B90F83 /* ScrollPresenter.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -50,6 +52,10 @@
 		13699715226B764F00B90F83 /* SearchRouter.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SearchRouter.m; sourceTree = "<group>"; };
 		13699718226B777100B90F83 /* PushViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PushViewController.h; sourceTree = "<group>"; };
 		13699719226B777100B90F83 /* PushViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PushViewController.m; sourceTree = "<group>"; };
+		1369971E226B8CA200B90F83 /* ScrollViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = ScrollViewController.h; path = ../ScrollViewController.h; sourceTree = "<group>"; };
+		1369971F226B8CA200B90F83 /* ScrollViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = ScrollViewController.m; path = ../ScrollViewController.m; sourceTree = "<group>"; };
+		13699724226B8CE000B90F83 /* ScrollPresenter.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ScrollPresenter.h; sourceTree = "<group>"; };
+		13699725226B8CE000B90F83 /* ScrollPresenter.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ScrollPresenter.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -84,6 +90,7 @@
 			children = (
 				1304B04F2265D2BF00569398 /* AppDelegate.h */,
 				1304B0502265D2BF00569398 /* AppDelegate.m */,
+				13699721226B8CA700B90F83 /* ScrollWindow */,
 				1369971B226B777800B90F83 /* PushWindow */,
 				136996F8226A09F500B90F83 /* SearchWindow */,
 				1304B05B2265D2C100569398 /* Assets.xcassets */,
@@ -199,6 +206,41 @@
 			path = Controller;
 			sourceTree = "<group>";
 		};
+		13699721226B8CA700B90F83 /* ScrollWindow */ = {
+			isa = PBXGroup;
+			children = (
+				13699722226B8CB200B90F83 /* View */,
+				13699727226B8CE700B90F83 /* Presenter */,
+			);
+			path = ScrollWindow;
+			sourceTree = "<group>";
+		};
+		13699722226B8CB200B90F83 /* View */ = {
+			isa = PBXGroup;
+			children = (
+				13699723226B8CBB00B90F83 /* Controller */,
+			);
+			path = View;
+			sourceTree = "<group>";
+		};
+		13699723226B8CBB00B90F83 /* Controller */ = {
+			isa = PBXGroup;
+			children = (
+				1369971E226B8CA200B90F83 /* ScrollViewController.h */,
+				1369971F226B8CA200B90F83 /* ScrollViewController.m */,
+			);
+			path = Controller;
+			sourceTree = "<group>";
+		};
+		13699727226B8CE700B90F83 /* Presenter */ = {
+			isa = PBXGroup;
+			children = (
+				13699724226B8CE000B90F83 /* ScrollPresenter.h */,
+				13699725226B8CE000B90F83 /* ScrollPresenter.m */,
+			);
+			path = Presenter;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -269,7 +311,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				13699712226B6EC000B90F83 /* SearchPresenter.m in Sources */,
+				13699720226B8CA200B90F83 /* ScrollViewController.m in Sources */,
 				13699716226B764F00B90F83 /* SearchRouter.m in Sources */,
+				13699726226B8CE000B90F83 /* ScrollPresenter.m in Sources */,
 				1369971A226B777100B90F83 /* PushViewController.m in Sources */,
 				1304B05A2265D2BF00569398 /* SberFlicker.xcdatamodeld in Sources */,
 				1369970E226A8AC500B90F83 /* PhotoCollectionViewCell.m in Sources */,

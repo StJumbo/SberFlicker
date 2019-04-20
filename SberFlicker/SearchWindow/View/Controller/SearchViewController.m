@@ -31,6 +31,10 @@
     self.presenter = [SearchPresenter new];
     self.presenter.netwotkDelegate = [NetworkService new];
     self.presenter.routerDelegate = [SearchRouter new];
+    [self.presenter.routerDelegate setNavVC:self.navigationController];
+    
+    
+    self.collectionViewArray = [NSMutableArray new];
     
     UICollectionViewFlowLayout *flowLayout = [UICollectionViewFlowLayout new];
     CGFloat itemWidthOffset = 10.0f;
@@ -43,6 +47,7 @@
     [self.collectionView registerClass:PhotoCollectionViewCell.class forCellWithReuseIdentifier:PhotoCollectionViewCell.reuseID];
     self.collectionView.delegate = self;
     self.collectionView.dataSource = self;
+    [self.collectionView setKeyboardDismissMode:UIScrollViewKeyboardDismissModeOnDrag];
     [self.collectionView setBackgroundColor:UIColor.whiteColor];
     
     [self.view addSubview:self.collectionView];
@@ -53,7 +58,8 @@
 {
     UIBarButtonItem *pushBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Push" style:UIBarButtonItemStylePlain target:self action:@selector(openPushVC)];
     //Не знаю, почему ширина pushBarButtonItem при инициализации задается равной 0,
-    //поэтому на глаз задал такую же ширину, как и у кнопки cancel searchbar'a
+    //поэтому на глаз задал такую же ширину, как и у кнопки cancel searchbar'a. Но
+    //текст все равно криво стоит
     [pushBarButtonItem setWidth:70.0f];
     self.navigationController.navigationBar.topItem.leftBarButtonItem = pushBarButtonItem;
     
@@ -63,20 +69,21 @@
     
     [self.navigationController.navigationBar addSubview:searchBar];
     searchBar.delegate = self;
-    [searchBar becomeFirstResponder];
+    
+    self.currentPage = 0;
     
     if (self.openFromPush)
     {
-        [searchBar resignFirstResponder];
         [searchBar setText:self.searchText];
         self.collectionViewArray = [NSMutableArray new];
-        self.currentPage = 0;
         [self searchNextPageWithText:self.searchText];
     }
+    else
+    {
+        self.searchText = [NSMutableString new];
+    }
+    
     self.openFromPush = NO;
-    self.searchText = [NSMutableString new];
-    self.collectionViewArray = [NSMutableArray new];
-    self.currentPage = 0;
 }
 
 -(void)viewWillDisappear:(BOOL)animated
@@ -175,6 +182,13 @@
     }
 }
 
+- (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath
+{
+    PhotoModel *picture = self.collectionViewArray[indexPath.item];
+    [self.presenter.routerDelegate showCurrentPicture:picture];
+    [self.collectionView deselectItemAtIndexPath:indexPath animated:NO];
+}
+
 #pragma mark - Reload CollectionView
 
 - (void)reloadCollectionView
@@ -189,7 +203,6 @@
 
 - (void)openPushVC
 {
-    [self.presenter.routerDelegate setNavVC:self.navigationController];
     [self.presenter.routerDelegate showPushNotificationsWindow];
 }
 
