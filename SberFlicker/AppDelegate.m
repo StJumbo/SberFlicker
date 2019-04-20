@@ -9,8 +9,9 @@
 #import "AppDelegate.h"
 #import <UIKit/UIKit.h>
 #import "SearchViewController.h"
+@import UserNotifications;
 
-@interface AppDelegate ()
+@interface AppDelegate () <UNUserNotificationCenterDelegate>
 
 @end
 
@@ -28,7 +29,50 @@
     [self.window makeKeyAndVisible];
     
     // Override point for customization after application launch.
+    UNUserNotificationCenter *center = [UNUserNotificationCenter currentNotificationCenter];
+    
+    UNAuthorizationOptions options = UNAuthorizationOptionBadge | UNAuthorizationOptionAlert | UNAuthorizationOptionSound;
+    
+    center.delegate = self;
+    
+    [center requestAuthorizationWithOptions:options completionHandler:^(BOOL granted, NSError * _Nullable error) {
+        if (!granted)
+        {
+            NSLog(@"access denied");
+        }
+    }];
     return YES;
+}
+
+- (void)userNotificationCenter:(UNUserNotificationCenter *)center willPresentNotification:(UNNotification *)notification withCompletionHandler:(void (^)(UNNotificationPresentationOptions))completionHandler
+{
+    if (completionHandler)
+    {
+        completionHandler(UNAuthorizationOptionSound | UNAuthorizationOptionAlert | UNAuthorizationOptionBadge);
+    }
+}
+
+- (void)userNotificationCenter:(UNUserNotificationCenter *)center didReceiveNotificationResponse:(UNNotificationResponse *)response withCompletionHandler:(void (^)(void))completionHandler
+{
+    UNNotificationContent *content = response.notification.request.content;
+    
+    if (content.userInfo[@"searchRequest"])
+    {
+        NSString *text = content.userInfo[@"searchRequest"];
+        UIWindow *window = [[UIWindow alloc] initWithFrame:UIScreen.mainScreen.bounds];
+        SearchViewController *rootVC = [SearchViewController new];
+        [rootVC setSearchingText:text];
+        UINavigationController *navVC = [[UINavigationController alloc] initWithRootViewController:rootVC];
+        
+        [window setRootViewController:navVC];
+        self.window = window;
+        [self.window makeKeyAndVisible];
+    }
+    
+    if (completionHandler)
+    {
+        completionHandler();
+    }
 }
 
 

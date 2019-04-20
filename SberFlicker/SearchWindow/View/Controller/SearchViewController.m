@@ -12,6 +12,7 @@
 #import "PhotoModel.h"
 #import "PhotoCollectionViewCell.h"
 #import "SearchPresenter.h"
+#import "SearchRouter.h"
 
 @interface SearchViewController () <UISearchBarDelegate, UICollectionViewDelegate, UICollectionViewDataSource>
 @property (nonatomic) NSMutableArray<PhotoModel *> *collectionViewArray;
@@ -19,31 +20,17 @@
 @property (nonatomic, strong) SearchPresenter *presenter;
 @property (nonatomic, strong) NSMutableString *searchText;
 @property (nonatomic) NSInteger currentPage;
+@property (nonatomic) BOOL openFromPush;
 @end
 
 @implementation SearchViewController
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    [UIApplication sharedApplication].applicationIconBadgeNumber = 0;
     self.presenter = [SearchPresenter new];
     self.presenter.netwotkDelegate = [NetworkService new];
-    self.currentPage = 0;
-    self.searchText = [NSMutableString new];
-    self.collectionViewArray = [NSMutableArray new];
-    
-    UIBarButtonItem *pushBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Push" style:UIBarButtonItemStylePlain target:self action:@selector(openPushVC)];
-    //Не знаю, почему ширина pushBarButtonItem при инициализации задается равной 0,
-    //поэтому на глаз задал такую же ширину, как и у кнопки cancel searchbar'a
-    [pushBarButtonItem setWidth:70.0f];
-    self.navigationController.navigationBar.topItem.leftBarButtonItem = pushBarButtonItem;
-    
-    UISearchBar *searchBar = [[UISearchBar alloc] initWithFrame:CGRectMake(self.navigationController.navigationBar.bounds.origin.x + pushBarButtonItem.width, self.navigationController.navigationBar.bounds.origin.y, self.navigationController.navigationBar.bounds.size.width - pushBarButtonItem.width, self.navigationController.navigationBar.bounds.size.height)];
-    [searchBar setShowsCancelButton:YES];
-    [searchBar setPlaceholder:@"Search pictures..."];
-    
-    [self.navigationController.navigationBar addSubview:searchBar];
-    searchBar.delegate = self;
-    [searchBar becomeFirstResponder];
+    self.presenter.routerDelegate = [SearchRouter new];
     
     UICollectionViewFlowLayout *flowLayout = [UICollectionViewFlowLayout new];
     CGFloat itemWidthOffset = 10.0f;
@@ -59,6 +46,49 @@
     [self.collectionView setBackgroundColor:UIColor.whiteColor];
     
     [self.view addSubview:self.collectionView];
+}
+
+
+- (void)viewWillAppear:(BOOL)animated
+{
+    UIBarButtonItem *pushBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@"Push" style:UIBarButtonItemStylePlain target:self action:@selector(openPushVC)];
+    //Не знаю, почему ширина pushBarButtonItem при инициализации задается равной 0,
+    //поэтому на глаз задал такую же ширину, как и у кнопки cancel searchbar'a
+    [pushBarButtonItem setWidth:70.0f];
+    self.navigationController.navigationBar.topItem.leftBarButtonItem = pushBarButtonItem;
+    
+    UISearchBar *searchBar = [[UISearchBar alloc] initWithFrame:CGRectMake(self.navigationController.navigationBar.bounds.origin.x + pushBarButtonItem.width, self.navigationController.navigationBar.bounds.origin.y, self.navigationController.navigationBar.bounds.size.width - pushBarButtonItem.width, self.navigationController.navigationBar.bounds.size.height)];
+    [searchBar setShowsCancelButton:YES];
+    [searchBar setPlaceholder:@"Search pictures..."];
+    
+    [self.navigationController.navigationBar addSubview:searchBar];
+    searchBar.delegate = self;
+    [searchBar becomeFirstResponder];
+    
+    if (self.openFromPush)
+    {
+        [searchBar resignFirstResponder];
+        [searchBar setText:self.searchText];
+        self.collectionViewArray = [NSMutableArray new];
+        self.currentPage = 0;
+        [self searchNextPageWithText:self.searchText];
+    }
+    self.openFromPush = NO;
+    self.searchText = [NSMutableString new];
+    self.collectionViewArray = [NSMutableArray new];
+    self.currentPage = 0;
+}
+
+-(void)viewWillDisappear:(BOOL)animated
+{
+    [self.searchText setString:@""];
+}
+
+- (void)setSearchingText:(NSString *)text
+{
+    self.openFromPush = YES;
+    self.searchText = [NSMutableString new];
+    [self.searchText setString:text];
 }
 
 
@@ -83,6 +113,7 @@
     NSString *text = searchBar.text;
     if (![self.searchText isEqualToString:text])
     {
+        [NSUserDefaults.standardUserDefaults setObject:text forKey:@"searchRequest"];
         [self.collectionViewArray removeAllObjects];
         [self reloadCollectionView];
         [self.searchText setString:text];
@@ -128,8 +159,6 @@
             });
         }];
     }
-    
-    
     return cell;
 }
 
@@ -160,7 +189,8 @@
 
 - (void)openPushVC
 {
-    NSLog(@"push pressed");
+    [self.presenter.routerDelegate setNavVC:self.navigationController];
+    [self.presenter.routerDelegate showPushNotificationsWindow];
 }
 
 

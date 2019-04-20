@@ -1,5 +1,5 @@
 //
-//  SearchPresenter.h
+//  SearchRouter.h
 //  SberFlicker
 //
 //  Created by Сергей Грызин on 20/04/2019.
@@ -7,15 +7,16 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "NetworkService.h"
-#import "SearchRouter.h"
+#import <UIKit/UIKit.h>
+#import "PhotoModel.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface SearchPresenter : NSObject
+@interface SearchRouter : NSObject
 
-@property (nonatomic, strong) NetworkService *netwotkDelegate;
-@property (nonatomic, strong) SearchRouter *routerDelegate;
+- (void)setNavVC:(UINavigationController *) navVC;
+- (void)showPushNotificationsWindow;
+- (void)showCurrentPicture:(PhotoModel *)picture;
 
 @end
 
