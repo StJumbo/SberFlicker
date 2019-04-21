@@ -119,7 +119,7 @@
     if (self.image)
     {
         CIImage *image = [[CIImage alloc] initWithImage:self.image];
-        NSInteger index = arc4random() % 5;
+        NSInteger index = 5;//arc4random() % 6;
         self.filter = [self filterWithType:index];
         [self.filter setValue:image forKey:kCIInputImageKey];
         CIImage *result = [self.filter valueForKey: @"outputImage"];
@@ -133,6 +133,7 @@
 
 - (CIFilter *)filterWithType:(NSInteger)type
 {
+    CIFilter *filter = [CIFilter filterWithName:@"CIPixellate"];
     switch (type) {
         case 0:
             return [CIFilter filterWithName:@"CIPhotoEffectTonal"];
@@ -149,6 +150,11 @@
         case 4:
             return [CIFilter filterWithName:@"CIColorMonochrome"];
             break;
+        case 5:
+            [filter setValue:@(50) forKey:kCIInputScaleKey];
+            return filter;
+            break;
+            
             
         default:
             return nil;
